@@ -1,0 +1,19 @@
+# Python/cache files
+__pycache__/
+*.py[cod]
+
+# Large downloaded/raw data
+data/raw/
+
+# Large generated matrices; regenerate with abishai_group_project_try.py
+data/clean/*.csv
+data/processed/*.csv
+
+# Keep reports and figures in results, but ignore very large signature tables if regenerated.
+results/cool_analysis/drug_maxdose_minus_dmso_signatures.csv
+
+# Local/tooling files
+.codex
+
+# Local credentials (never commit)
+.gh_token
