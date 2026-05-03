@@ -332,7 +332,13 @@ def make_ml_matrix(
     dyn_values = processed_values[dyn_cols]
     keep = dyn_values.notna().mean(axis=1) >= min_presence
     ml_matrix = variants.loc[keep, id_cols].copy()
-    ml_matrix = pd.concat([ml_matrix, np.log2(dyn_values.loc[keep] + 1.0)], axis=1)
+    log2_values = np.log2(dyn_values.loc[keep] + 1.0)
+    col_min = log2_values.min()
+    col_max = log2_values.max()
+    col_range = col_max - col_min
+    col_range[col_range == 0] = 1.0
+    log2_values = (log2_values - col_min) / col_range
+    ml_matrix = pd.concat([ml_matrix, log2_values], axis=1)
     return ml_matrix
 
 
@@ -380,7 +386,13 @@ def make_clean_log2_matrix(
     clean["dyn_present_fraction" if measurement_type == "dyn" else "unmod_present_fraction"] = (
         values.loc[keep].notna().mean(axis=1).to_numpy()
     )
-    clean = pd.concat([clean, np.log2(values.loc[keep] + 1.0)], axis=1)
+    log2_values = np.log2(values.loc[keep] + 1.0)
+    col_min = log2_values.min()
+    col_max = log2_values.max()
+    col_range = col_max - col_min
+    col_range[col_range == 0] = 1.0
+    log2_values = (log2_values - col_min) / col_range
+    clean = pd.concat([clean, log2_values], axis=1)
     return clean
 
 
