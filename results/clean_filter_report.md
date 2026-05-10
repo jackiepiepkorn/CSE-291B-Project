@@ -24,12 +24,12 @@
 
 ## Clean files written
 
-- `data/clean/clean_sample_metadata.csv`
-- `data/clean/clean_variant_metadata_quality_filtered.csv`
-- `data/clean/clean_variant_dyn_log2_min20.csv`: 8,665 rows x 508 columns
-- `data/clean/clean_variant_dyn_log2_min80_ml.csv`: 1,233 rows x 508 columns
-- `data/clean/clean_unmod_log2_min20.csv`: 11,824 rows x 508 columns
-- `data/clean/clean_unmod_log2_min80_ml.csv`: 2,435 rows x 508 columns
+- `data\clean\clean_sample_metadata.csv`
+- `data\clean\clean_variant_metadata_quality_filtered.csv`
+- `data\clean\clean_variant_dyn_log2_min20.csv`: 8,665 rows x 508 columns
+- `data\clean\clean_variant_dyn_log2_min80_ml.csv`: 1,233 rows x 508 columns
+- `data\clean\clean_unmod_log2_min20.csv`: 11,824 rows x 508 columns
+- `data\clean\clean_unmod_log2_min80_ml.csv`: 2,435 rows x 508 columns
 
 ## Which clean file to use
 

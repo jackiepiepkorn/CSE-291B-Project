@@ -28,13 +28,13 @@ Practical interpretation:
 
 ## Figures
 
-- `condition_counts`: `results/figures/condition_counts.png`
-- `column_missingness`: `results/figures/column_missingness_hist.png`
-- `peptide_coverage`: `results/figures/peptide_present_fraction_hist.png`
-- `intensity_distribution`: `results/figures/log2_intensity_distribution.png`
-- `dose_grid`: `results/figures/drug_dose_grid.png`
-- `mod_unmod_scatter`: `results/figures/mod_vs_unmod_scatter.png`
-- `top_hits`: `results/figures/top_dmso_vs_max_dose_hits.png`
+- `condition_counts`: `results\figures\condition_counts.png`
+- `column_missingness`: `results\figures\column_missingness_hist.png`
+- `peptide_coverage`: `results\figures\peptide_present_fraction_hist.png`
+- `intensity_distribution`: `results\figures\log2_intensity_distribution.png`
+- `dose_grid`: `results\figures\drug_dose_grid.png`
+- `mod_unmod_scatter`: `results\figures\mod_vs_unmod_scatter.png`
+- `top_hits`: `results\figures\top_dmso_vs_max_dose_hits.png`
 
 ## First-pass hit-call table
 

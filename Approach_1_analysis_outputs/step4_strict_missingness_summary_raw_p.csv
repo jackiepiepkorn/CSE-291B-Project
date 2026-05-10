@@ -1,0 +1,16 @@
+metric,value
+strict_valid_pairs,155026.0
+strict_invalid_pairs,278224.0
+strict_valid_fraction,0.35782111944604733
+strict_raw_p_le_0.05,20732.0
+strict_raw_p_le_0.05_fraction,0.13373240617702836
+strict_raw_p_le_0.01,5693.0
+strict_raw_p_le_0.01_fraction,0.036722872292389665
+strict_raw_p_le_0.001,752.0
+strict_raw_p_le_0.001_fraction,0.00485079922077587
+strict_increasing_raw_significant,7294.0
+strict_decreasing_raw_significant,13438.0
+strict_median_slope,-0.02211372116148361
+strict_median_abs_slope,0.10903976051462702
+strict_median_r_squared,0.13697180776284104
+strict_median_mse,0.15664353212344687
