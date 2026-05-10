@@ -36,6 +36,21 @@ This uses `data/clean/clean_variant_dyn_log2_min20.csv` and writes PCA,
 drug-perturbation, similarity, dose-response, and heatmap outputs under
 `results/cool_analysis/`.
 
+## Reproduce Approach 4 global statistical analysis
+
+```bash
+python approach4_global_statistical_analysis.py
+```
+
+This follows the group statistical plan for the global/multiple-testing part of
+the project. For each peptide-drug pair, it fits a dose-response regression
+`log2 abundance ~ log10(concentration)`, applies Benjamini-Hochberg FDR
+correction, and adds a Wilcoxon signed-rank treatment-vs-DMSO screen as a
+non-parametric supporting analysis. Outputs are written under
+`results/approach4_global_stats/`, including a full peptide-drug results table,
+drug-level summaries, protein-group summaries, figures, and a paste-ready
+Google Docs writeup.
+
 ## Data policy
 
 Large downloaded and generated data files are intentionally not committed:
