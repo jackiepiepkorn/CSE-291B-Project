@@ -61,3 +61,4 @@ The analysis should still be described as preliminary. Most conditions have only
 - `regression_fdr_hits_by_drug.png`: top-drug summary figure.
 - `regression_p_value_histogram.png`: p-value diagnostic figure.
 - `regression_volcano.png`: effect-size versus FDR figure.
+- `protein_drug_heatmap.png`: drug × protein group mean regression slope heatmap (restricted to regression FDR hit proteins/drugs).

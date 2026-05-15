@@ -382,6 +382,76 @@ def plot_outputs(results: pd.DataFrame, drug_summary: pd.DataFrame) -> None:
         savefig(fig, OUT_DIR / "regression_volcano.png")
 
 
+def plot_protein_drug_heatmap(results: pd.DataFrame) -> None:
+    """Heatmap of mean regression slope per (protein group × drug).
+
+    Restricted to proteins and drugs that have at least one within-drug
+    regression FDR hit, so the matrix stays tractable.  Rows (proteins) are
+    sorted by their maximum absolute slope across drugs so the most responsive
+    proteins appear at the top.  Protein labels are shortened to the gene-name
+    portion of the UniProt identifier (e.g. CDK2_HUMAN).
+    """
+    hit_mask = results["regression_within_drug_fdr_hit"]
+    hit_proteins = results.loc[hit_mask, "Top canonical protein"].dropna().unique()
+    hit_drugs = results.loc[hit_mask, "drug"].dropna().unique()
+
+    if len(hit_proteins) == 0 or len(hit_drugs) == 0:
+        return
+
+    subset = results[
+        results["Top canonical protein"].isin(hit_proteins)
+        & results["drug"].isin(hit_drugs)
+    ].dropna(subset=["Top canonical protein", "regression_slope_log2_per_log10_nM"])
+
+    agg = (
+        subset.groupby(["Top canonical protein", "drug"])["regression_slope_log2_per_log10_nM"]
+        .mean()
+        .reset_index()
+    )
+
+    matrix = (
+        agg.pivot(
+            index="Top canonical protein",
+            columns="drug",
+            values="regression_slope_log2_per_log10_nM",
+        ).fillna(0.0)
+    )
+
+    row_order = matrix.abs().max(axis=1).sort_values(ascending=False).index
+    matrix = matrix.loc[row_order]
+
+    def shorten(label: str) -> str:
+        parts = label.split("|")
+        return parts[-1] if len(parts) >= 3 else label
+
+    short_rows = [shorten(p) for p in matrix.index]
+
+    n_rows, n_cols = matrix.shape
+    fig_w = max(10, n_cols * 1.1 + 3)
+    fig_h = max(8, n_rows * 0.22 + 2)
+    fig, ax = plt.subplots(figsize=(fig_w, fig_h))
+
+    vmax = max(1.0, float(np.nanquantile(matrix.abs().values, 0.95)))
+    im = ax.imshow(matrix.values, aspect="auto", cmap="RdBu_r", vmin=-vmax, vmax=vmax)
+
+    ax.set_xticks(range(n_cols))
+    ax.set_xticklabels(matrix.columns, rotation=45, ha="right", fontsize=8)
+    ax.set_yticks(range(n_rows))
+    ax.set_yticklabels(short_rows, fontsize=6)
+
+    ax.set_title(
+        "Drug × Protein Group: Mean Regression Slope (log2 / log10 nM)\n"
+        f"Proteins and drugs with ≥1 within-drug regression FDR hit  "
+        f"({n_rows} proteins × {n_cols} drugs)",
+        fontsize=10,
+    )
+    ax.set_xlabel("Drug")
+    ax.set_ylabel("Protein Group")
+
+    plt.colorbar(im, ax=ax, label="Mean regression slope (log2 / log10 nM)", shrink=0.6)
+    savefig(fig, OUT_DIR / "protein_drug_heatmap.png")
+
+
 def write_reports(
     results: pd.DataFrame, drug_summary: pd.DataFrame, protein_summary: pd.DataFrame
 ) -> None:
@@ -462,6 +532,7 @@ def write_reports(
             "- `regression_fdr_hits_by_drug.png`: top-drug summary figure.",
             "- `regression_p_value_histogram.png`: p-value diagnostic figure.",
             "- `regression_volcano.png`: effect-size versus FDR figure.",
+            "- `protein_drug_heatmap.png`: drug × protein group mean regression slope heatmap (restricted to regression FDR hit proteins/drugs).",
         ]
     )
     (OUT_DIR / "approach4_global_stats_report.md").write_text("\n".join(report) + "\n")
@@ -505,6 +576,7 @@ def main() -> None:
     drug_summary.to_csv(OUT_DIR / "drug_level_summary.csv", index=False)
     protein_summary.to_csv(OUT_DIR / "protein_group_summary.csv", index=False)
     plot_outputs(results, drug_summary)
+    plot_protein_drug_heatmap(results)
     write_reports(results, drug_summary, protein_summary)
     print(f"Wrote Approach 4 global statistical outputs to {OUT_DIR}")
 
