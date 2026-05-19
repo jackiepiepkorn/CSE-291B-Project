@@ -418,37 +418,40 @@ def plot_protein_drug_heatmap(results: pd.DataFrame) -> None:
     )
 
     row_order = matrix.abs().max(axis=1).sort_values(ascending=False).index
-    matrix = matrix.loc[row_order]
+    matrix = matrix.loc[row_order].head(30)
 
     def shorten(label: str) -> str:
         parts = label.split("|")
         return parts[-1] if len(parts) >= 3 else label
 
-    short_rows = [shorten(p) for p in matrix.index]
+    short_cols = [shorten(p) for p in matrix.index]
 
-    n_rows, n_cols = matrix.shape
-    fig_w = max(10, n_cols * 1.1 + 3)
-    fig_h = max(8, n_rows * 0.22 + 2)
+    # Transpose: drugs on y-axis, proteins on x-axis
+    matrix = matrix.T
+
+    n_rows, n_cols = matrix.shape  # now: n_rows=drugs, n_cols=proteins
+    cell_w = 0.55
+    fig_w = n_cols * cell_w + 4
+    fig_h = max(6, n_rows * 1.4 + 3)
     fig, ax = plt.subplots(figsize=(fig_w, fig_h))
 
     vmax = max(1.0, float(np.nanquantile(matrix.abs().values, 0.95)))
     im = ax.imshow(matrix.values, aspect="auto", cmap="RdBu_r", vmin=-vmax, vmax=vmax)
 
     ax.set_xticks(range(n_cols))
-    ax.set_xticklabels(matrix.columns, rotation=45, ha="right", fontsize=8)
+    ax.set_xticklabels(short_cols, rotation=45, ha="right", fontsize=18)
     ax.set_yticks(range(n_rows))
-    ax.set_yticklabels(short_rows, fontsize=6)
+    ax.set_yticklabels(matrix.index, fontsize=18)
 
     ax.set_title(
-        "Drug × Protein Group: Mean Regression Slope (log2 / log10 nM)\n"
-        f"Proteins and drugs with ≥1 within-drug regression FDR hit  "
-        f"({n_rows} proteins × {n_cols} drugs)",
-        fontsize=10,
+        "Top 30 Proteins by Mean Regression Slope",
+        fontsize=16,
     )
-    ax.set_xlabel("Drug")
-    ax.set_ylabel("Protein Group")
+    ax.set_xlabel("Protein Group", fontsize=16)
+    ax.set_ylabel("Drug", fontsize=16)
 
-    plt.colorbar(im, ax=ax, label="Mean regression slope (log2 / log10 nM)", shrink=0.6)
+    plt.colorbar(im, ax=ax, label="Mean regression slope (log2 / log10 nM)", shrink=0.7)
+    plt.tight_layout()
     savefig(fig, OUT_DIR / "protein_drug_heatmap.png")
 
 
