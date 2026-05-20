@@ -18,4 +18,5 @@ results/cool_analysis/drug_maxdose_minus_dmso_signatures.csv
 # Local credentials (never commit)
 .gh_token
 results/approach4_global_stats/global_peptide_drug_statistical_results.csv
-results/approach4_global_stats/global_peptide_drug_statistical_results.cs
+results/approach4_global_stats/protein_group_summary.csv
+results/approach4_global_stats/drug_level_summary.csv
