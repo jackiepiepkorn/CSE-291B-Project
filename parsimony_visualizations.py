@@ -576,9 +576,9 @@ def plot_bipartite_mapping(stats: pd.DataFrame, glob: pd.DataFrame,
         "changed":   "#E45756",
     }
     CAT_LABEL = {
-        "unchanged": "Unchanged — top canonical = parsimony (single protein)",
-        "grouped":   "Grouped — top canonical is in an indiscernible multi-protein group",
-        "changed":   "Changed — peptide mapped to multiple proteins; parsimony chose a different one",
+        "unchanged": "Unchanged: top canonical protein is unique and the same as parsimony mapping",
+        "grouped":   "Grouped: top canonical protein is in an indiscernible multi-protein group",
+        "changed":   "Changed: parsimony mapped to a different protein since top canonical was subsumed by another protein",
     }
 
     # ── select exemplary peptides ─────────────────────────────────────────────
@@ -606,6 +606,15 @@ def plot_bipartite_mapping(stats: pd.DataFrame, glob: pd.DataFrame,
     )
 
     pep_list   = selected["Variant"].tolist()
+
+    def _swap(lst, a, b):
+        i, j = lst.index(a), lst.index(b)
+        lst[i], lst[j] = lst[j], lst[i]
+
+    _swap(pep_list, ".YHGVSLLNPPETLNL.", ".AFGVPVR.")
+    last, second_last = pep_list[-1], pep_list[-2]
+    pep_list[-1], pep_list[-2] = second_last, last
+
     pep_top    = dict(zip(selected["Variant"], selected["Top canonical protein"]))
     pep_grp    = dict(zip(selected["Variant"], selected["protein_group"]))
     pep_cat    = dict(zip(selected["Variant"], selected["change_type"]))
@@ -672,8 +681,8 @@ def plot_bipartite_mapping(stats: pd.DataFrame, glob: pd.DataFrame,
     for p in left_prots:
         ax.text(X_LEFT_NODE, left_y[p], short_name(p),
                 ha="right", va="center", fontsize=11,
-                bbox=dict(boxstyle="round,pad=0.35", facecolor="#EEF2F8",
-                          edgecolor="#4C78A8", linewidth=1.4),
+                bbox=dict(boxstyle="round,pad=0.35", facecolor="#EDE7F6",
+                          edgecolor="#7B1FA2", linewidth=1.4),
                 zorder=2)
 
     # ── peptide nodes (middle) ────────────────────────────────────────────────
@@ -700,11 +709,11 @@ def plot_bipartite_mapping(stats: pd.DataFrame, glob: pd.DataFrame,
         short = [short_name(p) for p in prots]
         if gs == 1:
             label = short[0]
-            fc, ec = "#EEF2F8", "#4C78A8"
+            fc, ec = "#E0F2F1", "#00897B"
         else:
             visible = short[:3] + ([f"+{gs-3}"] if gs > 3 else [])
             label = " | ".join(visible)
-            fc, ec = "#FFF3E0", "#F58518"
+            fc, ec = "#B2DFDB", "#00695C"
         ax.text(X_RIGHT_NODE, right_y[g], label,
                 ha="left", va="center", fontsize=11,
                 bbox=dict(boxstyle="round,pad=0.35", facecolor=fc,
@@ -712,11 +721,11 @@ def plot_bipartite_mapping(stats: pd.DataFrame, glob: pd.DataFrame,
                 zorder=2)
 
     # ── column headers ────────────────────────────────────────────────────────
-    ax.text(X_LEFT_NODE,  1.01, "Before\nTop canonical protein",
+    ax.text(X_LEFT_NODE + 0.06,  1.01, "Top canonical\nprotein",
             ha="right", va="bottom", fontsize=12, fontweight="bold", color="#333333")
-    ax.text(x_pep_mid,    1.01, "Significant peptides",
+    ax.text(x_pep_mid,            1.01, "Significant peptides",
             ha="center", va="bottom", fontsize=12, fontweight="bold", color="#333333")
-    ax.text(X_RIGHT_NODE, 1.01, "After\nParsimony protein group",
+    ax.text(X_RIGHT_NODE - 0.06, 1.01, "Parsimony\nprotein group",
             ha="left",  va="bottom", fontsize=12, fontweight="bold", color="#333333")
 
     ax.axvline(0.5, color="#CCCCCC", lw=0.8, linestyle="--", zorder=0)
@@ -727,14 +736,21 @@ def plot_bipartite_mapping(stats: pd.DataFrame, glob: pd.DataFrame,
                        edgecolor=CAT_COLOR[c], label=CAT_LABEL[c])
         for c in ["unchanged", "grouped", "changed"]
     ]
-    ax.legend(handles=handles, loc="lower center", ncol=1, fontsize=10,
-              bbox_to_anchor=(0.5, -0.055), framealpha=0.95,
-              title="Parsimony outcome", title_fontsize=10.5)
+    handles += [
+        mpatches.Patch(facecolor="#EDE7F6", edgecolor="#7B1FA2", linewidth=1.4,
+                       label="Top canonical protein by MAESTRO (before parsimony)"),
+        mpatches.Patch(facecolor="#E0F2F1", edgecolor="#00897B", linewidth=1.4,
+                       label="Parsimony mapping (after parsimony)"),
+    ]
+    ax.legend(handles=handles, loc="upper center", ncol=1, fontsize=11.5,
+              bbox_to_anchor=(0.5, 0.01), framealpha=0.95,
+             title_fontsize=12)
 
-    ax.set_title("Before / After Parsimony: Top Canonical Protein → Parsimony Group",
+    ax.set_title("Before / After Parsimony: Top Canonical Protein by MAESTRO → Parsimony Group",
                  fontsize=13, pad=10)
 
     fig.tight_layout()
+    fig.subplots_adjust(bottom=0.18)
     out = OUT_DIR / "parsimony_bipartite_mapping.png"
     fig.savefig(out, dpi=150, bbox_inches="tight")
     plt.close(fig)
